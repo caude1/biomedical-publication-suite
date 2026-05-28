@@ -1,0 +1,7 @@
+interface:
+  display_name: "Biomedical Publication Suite"
+  short_description: "Write and QC biomedical publication artifacts"
+  default_prompt: "Use $biomedical-publication-suite to refine this biomedical manuscript artifact into publication-ready text."
+
+policy:
+  allow_implicit_invocation: true
