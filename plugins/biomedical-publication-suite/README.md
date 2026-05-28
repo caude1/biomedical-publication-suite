@@ -13,47 +13,147 @@ Biomedical Publication Suite helps a coding agent review analysis outputs, figur
 - Adapt a manuscript for a target journal or article type.
 - Keep author checks and missing facts out of submission-facing prose.
 
-## Best Starting Prompt
+## Prompt Library
 
-Use this when you want the agent to propose the paper before drafting it:
+These prompts assume the agent is already running inside the research directory that contains the study files.
 
-    Use Biomedical Publication Suite.
+For the first line, use whichever handle fits the agent:
 
-    Review this directory as a completed biomedical study and propose the manuscript before drafting it.
+```text
+Codex: $biomedical-publication-suite
+Claude Code: /biomedical-publication-suite
+Plain fallback: Use Biomedical Publication Suite.
+```
 
-    Inventory the analysis, results, figures, tables, notes, and any existing draft. Return:
+### 1. Propose The Manuscript Before Drafting
 
-    1. The proposed scientific story.
-    2. The headline finding and central manuscript thesis.
-    3. A one-line-per-section manuscript outline.
-    4. What you would feature, shorten, move to the supplement, or leave out, with a brief reason for each choice.
-    5. Anything the authors need to verify before submission.
+Use this when the project is messy, exploratory, high stakes, or still needs a narrative decision before anyone spends time on a full draft.
 
-    Use your best judgment to decide what the paper is about.
+```text
+$biomedical-publication-suite
 
-    Do not draft the full manuscript yet. I want to review the proposed story first.
+Review this directory as a completed biomedical study and propose the manuscript before drafting it.
 
-## One-Step Draft Prompt
+Run a narrative audit. Inventory the analysis, results, figures, tables, notes, and any existing draft. Return:
 
-Use this when you want the agent to proceed directly to a manuscript draft:
+1. The proposed scientific story.
+2. The headline finding and central manuscript thesis.
+3. A one-line-per-section manuscript outline.
+4. The editorial rationale for what you would feature, subordinate, move to supplement, cut, or reserve for limitations.
+5. Open author-verification items for anything that cannot be confirmed from the project files.
 
-    Use Biomedical Publication Suite.
+Use your best judgment to decide what the paper is about.
 
-    Review this directory and produce a complete manuscript draft.
+Do not draft the full manuscript yet. I want to review the narrative first.
+```
 
-    Use your best judgment to decide the manuscript narrative, including what to feature, shorten, move to the supplement, or leave out. Do not summarize every output. Organize the results into the strongest accurate scientific story supported by the project files.
+### 2. Build The Full Manuscript
 
-    Draft the manuscript, check the voice and structure, and list anything the authors need to verify separately.
+Use this after you have approved a narrative audit, or when the project already has a clear manuscript direction.
 
-## Useful Follow-Up Prompts
+```text
+$biomedical-publication-suite
 
-    Build the full manuscript from the approved story.
+Build the full manuscript package from this directory.
 
-    Revise the existing draft using the project outputs. Cut, reorder, or reframe sections as needed.
+If a narrative brief or narrative audit already exists, build from the approved narrative. Otherwise, treat this as a completed biomedical study: review the project evidence, decide the strongest manuscript narrative, and use your best judgment on what to feature, subordinate, move to supplement, cut, or reserve for limitations.
 
-    Adapt this manuscript for the target journal and article type named in the project files.
+Infer the study design, article type, and target-journal needs from the project files when possible. If they are not clear, make conservative choices and record them as author-verification items rather than stopping.
 
-    Use the reviewer and editor comments in this directory to revise the manuscript and draft a point-by-point response.
+Proceed without clarifying questions unless something is truly blocking. Do not invent missing numbers, methods, results, ethics language, citations, or journal requirements.
+```
+
+### 3. One-Shot Manuscript Draft
+
+Use this when you want the agent to move directly from project folder to manuscript draft without a narrative checkpoint.
+
+```text
+$biomedical-publication-suite
+
+Review this directory and produce a complete manuscript draft.
+
+Use your best judgment to decide the manuscript narrative, including what to include, subordinate, move to supplement, cut, or reserve for limitations. Do not mechanically summarize every output. Organize the results into the strongest scientific story supported by the project files.
+
+Create the manuscript package, draft the manuscript, run the manuscript voice audit, run QC as a final safety check, and list author-verification items separately.
+```
+
+### 4. Refine Existing Draft
+
+Use this when a manuscript already exists but needs a stronger story, cleaner structure, or publication-facing prose.
+
+```text
+$biomedical-publication-suite
+
+Review this directory and revise the existing manuscript draft.
+
+Use the project outputs to judge whether the current draft has the right narrative, whether sections should be cut, reordered, or reframed, whether any included result distracts from the central thesis, and whether any omitted result should be restored.
+
+Revise the manuscript directly. Keep author-facing notes separate from the manuscript.
+```
+
+### 5. Skeptical Pre-Draft Critique
+
+Use this when you are not sure the project supports a manuscript yet, or when you want a hard editorial read before drafting.
+
+```text
+$biomedical-publication-suite
+
+Review this directory as a skeptical senior reviewer.
+
+Do not rewrite yet. Tell me:
+
+1. What paper this project is currently trying to be.
+2. Whether the central claim is earned.
+3. Which results belong in the main text.
+4. Which results belong in the supplement.
+5. Which results should be cut or kept only as internal context.
+6. What must be fixed before drafting.
+7. Whether there is a publishable manuscript here, and if so, what the best version is.
+```
+
+### 6. Journal Adaptation
+
+Use this when you have a draft and need it reshaped for a specific journal or article type.
+
+```text
+$biomedical-publication-suite
+
+Adapt the manuscript package in this directory for the target journal and article type named in the project files.
+
+If the target journal or article type is not specified, infer the most appropriate format conservatively and record the assumption as an author-verification item.
+
+Match the journal's structure, abstract format, length expectations, reporting-guideline needs, references, display limits, and required statements where available. Preserve the central thesis and scientific accuracy.
+```
+
+### 7. Reviewer Response
+
+Use this when editor or reviewer comments are available as files in the directory or pasted into the chat.
+
+```text
+$biomedical-publication-suite
+
+Use the reviewer and editor comments in this directory, or the comments pasted below, to revise the manuscript and draft a point-by-point response.
+
+For each comment:
+
+1. Classify the issue.
+2. Decide whether to revise, clarify, add analysis, decline, or explain.
+3. Make the manuscript change when warranted.
+4. Draft response text naming what changed and where.
+5. If you would push back, do so respectfully and explain the reasoning.
+
+Keep manuscript revisions separate from response-letter explanations.
+```
+
+### Recommended Defaults
+
+Use **Prompt 1** when the project is messy, exploratory, or high stakes. That is the best main workflow.
+
+Use **Prompt 2** after you approve the narrative.
+
+Use **Prompt 3** when you want the agent to produce the paper without a checkpoint.
+
+Use **Prompt 5** when you are not sure the project actually supports a manuscript yet.
 
 ## Writing Philosophy
 
