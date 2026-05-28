@@ -1,0 +1,15 @@
+description = "Use Biomedical Publication Suite guidance for biomedical manuscripts and publication artifacts."
+prompt = """
+Use the biomedical-publication-suite Agent Skill if it is available. If it is not visible in /skills list, follow this portable fallback:
+
+- Work only from supplied evidence and files.
+- Preserve all numbers exactly unless explicitly asked to reformat.
+- Do not invent citations, statistics, ethics statements, author details, funding, or journal rules.
+- Use association language for observational and nonexperimental work.
+- Strip internal workflow language and research-timeline leakage.
+- Return the publication-facing artifact first, then concise author-facing notes.
+- For full manuscript projects, draft the clearest useful package first; add extra checklists or tracking files only when final verification or submission readiness requires them.
+
+Task:
+{{args}}
+"""
