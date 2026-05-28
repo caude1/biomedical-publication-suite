@@ -1,0 +1,24 @@
+{
+  "name": "biomedical-publication-suite",
+  "version": "0.1.0",
+  "description": "Turns biomedical study folders, analysis outputs, drafts, reviewer comments, and journal requirements into polished manuscripts and publication materials.",
+  "author": {
+    "name": "Carlos"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Biomedical Publication Suite",
+    "shortDescription": "Turn study outputs into polished biomedical papers.",
+    "longDescription": "Open an analysis project and use this suite to find the manuscript story, decide which results to feature or cut, draft and revise the paper, polish abstracts, figures, tables, cover letters, and reviewer responses, and keep author-facing checks separate from publication-ready prose.",
+    "developerName": "Carlos",
+    "category": "Research",
+    "capabilities": [
+      "Find the manuscript story",
+      "Draft full manuscripts",
+      "Refine abstracts and display text",
+      "Prepare reviewer responses",
+      "Check submission readiness"
+    ],
+    "defaultPrompt": "Use $biomedical-publication-suite to review this study directory, decide the strongest manuscript story, and draft or refine the publication materials."
+  }
+}
