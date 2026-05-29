@@ -33,13 +33,16 @@ Two layers govern final publication quality, in this order:
    - refine-artifact: one abstract, section, title, caption, legend, table text, cover letter, graphical abstract text, or response paragraph.
    - build-or-revise-manuscript: create, rewrite, audit, journal-adapt, or prepare a manuscript package from project evidence.
    - respond-to-reviewers: turn reviewer/editor comments into manuscript revisions and point-by-point responses.
+   - build-evidence: find literature, verify citations, screen studies, or extract source-grounded study data.
 2. Decide the evidence surface:
    - For small text-only tasks, work directly from the supplied text and return the clean artifact first.
    - For manuscript tasks, inventory the repository and create or update the lean publication package only when it helps quality or reproducibility.
+   - For literature-dependent claims, use verified source records and extraction rows rather than model memory.
 3. Use the minimum references needed:
    - references/operating-model.md for workflow routing and package discipline.
    - references/manuscript-voice.md for memo voice, forest-first writing, caveat placement, hedging discipline, and the mandatory voice audit.
    - references/evidence-and-claim-control.md for evidence precedence, claim tracing, citation handling, and subagent use.
+   - references/literature-intelligence.md for literature search, identifier verification, screening, source-anchored extraction, and evidence-package stop rules.
    - references/narrative-frameworks.md for narrative-audit structure and the confident-language method.
    - references/publication-surface-standard.md for prose, labels, captions, legends, tables, reviewer responses, anti-leakage rules, and PHI precautions.
    - references/section-and-artifact-guides.md for section-specific drafting, paragraph flow, display text, cover letters, and response text.
@@ -50,6 +53,9 @@ Two layers govern final publication quality, in this order:
 4. Use deterministic helpers when useful:
    - python3 scripts/init_publication_package.py --repo-root .
    - python3 scripts/publication_qc.py --repo-root . --package-dir manuscript
+   - python3 scripts/verify_identifiers.py --input manuscript/literature_register.csv --fail-on-quarantine
+   - python3 scripts/extraction_audit.py --input manuscript/extraction_ledger.csv
+   - python3 scripts/citation_audit.py --claim-register manuscript/claim_register.csv --literature-register manuscript/literature_register.csv
    - Use --fail-on-warn only for submission-ready packages after warnings have been adjudicated by the senior-editor read.
 
 ## Non-Negotiables
@@ -60,6 +66,8 @@ Two layers govern final publication quality, in this order:
 - Use confident manuscript voice by default. Confident-language work is not a special mode; it is the standard publication register. The special task is only when the user explicitly asks for a high-impact rewrite or adversarial ceiling pass.
 - Use design-matched language. Observational, retrospective, cross-sectional, registry-based, public-data, before-after, ecological, and nonrandomized work gets association language unless a justified causal estimand is explicit.
 - Do not invent sample sizes, dates, estimates, p-values, confidence intervals, models, endpoints, citations, ethics language, journal rules, funding, author contributions, or conflicts.
+- Discovery may be broad; inclusion, identifiers, and extraction must be deterministic and source-grounded.
+- Do not introduce literature claims, citations, PMIDs, DOIs, or extracted study fields from model memory. Use verified sources or mark the item as needing verification.
 - Keep publication-facing text free of repository names, skill names, workflow labels, version labels, TODO language, unresolved author checks, figure-design rationale, and analysis-history narration.
 - Never place identifiable patient detail in case reports, examples, reviewer responses, or narrative artifacts. De-identify or quarantine details that are not publication-safe.
 - Return clean publication-facing text first. Put author-facing concerns in Notes, open_items.md, editorial_rationale.md, or submission_readiness.md.
@@ -89,6 +97,18 @@ For manuscript builds, major revisions, journal adaptation, reviewer responses, 
 4. Draft or revise manuscript.md from the brief and facts, not from memory or administrative notes.
 5. Run the manuscript voice audit from references/manuscript-voice.md and reverse-outline the draft before QC.
 6. Run QC as a cheap net, fix blocking findings, adjudicate warnings through the senior-editor read, and report residual author checks in open_items.md.
+
+### Literature Evidence Work
+
+For literature search, citation verification, study screening, evidence mapping, or extraction:
+
+1. Use references/literature-intelligence.md.
+2. Define the question and eligibility criteria before searching.
+3. Search broadly across available databases, full-text sources, registries, review tables, references, citation trails, and the open web.
+4. Treat all hits as candidates until identifiers are verified.
+5. Run identifier verification before citing or extracting from a source.
+6. Extract fields only with source locators and quotes when possible.
+7. Run extraction and citation audits before using literature evidence in publication-facing text.
 
 ## Subagent Guidance
 
@@ -120,7 +140,7 @@ Before final delivery on a package, first perform the senior-editor read and man
 
 Before calling a package submission-ready, perform the senior-editor read again after all script findings are adjudicated. Then run:
 
-    python3 <skill-dir>/scripts/publication_qc.py --repo-root . --package-dir manuscript --fail-on-warn --require-claim-register
+    python3 <skill-dir>/scripts/publication_qc.py --repo-root . --package-dir manuscript --fail-on-warn --require-claim-register --require-literature-integrity
 
 For text-only artifacts stored as files:
 

@@ -9,6 +9,7 @@ Biomedical Publication Suite helps a coding agent review analysis outputs, figur
 - Find the strongest manuscript story in a completed study folder.
 - Decide which results belong in the main text, supplement, limitations, or author notes.
 - Draft full biomedical manuscripts from project evidence.
+- Find relevant papers, verify citations, and extract study details with source support.
 - Rewrite abstracts, titles, captions, legends, tables, cover letters, and reviewer responses.
 - Adapt a manuscript for a target journal or article type.
 - Keep author checks and missing facts out of submission-facing prose.
@@ -145,6 +146,22 @@ For each comment:
 Keep manuscript revisions separate from response-letter explanations.
 ```
 
+### 8. Find And Extract The Literature
+
+Use this when the paper needs a stronger literature base, or when you want a reliable evidence table before writing.
+
+```text
+$biomedical-publication-suite
+
+Find the relevant biomedical literature for this question and build a verified evidence package.
+
+Define the question and inclusion criteria first. Search broadly, including available databases, reference lists, citation trails, registries, and full text when available.
+
+Verify each citation before using it. For every included study, extract the key details with a source locator or quote whenever possible.
+
+Return the search strategy, candidate papers, included and excluded studies, verified citations, extracted study details, and anything that still needs full-text access or author review.
+```
+
 ### Recommended Defaults
 
 Use **Prompt 1** when the project is messy, exploratory, or high stakes. That is the best main workflow.
@@ -155,6 +172,10 @@ Use **Prompt 3** when you want the agent to produce the paper without a checkpoi
 
 Use **Prompt 5** when you are not sure the project actually supports a manuscript yet.
 
+Use **Prompt 8** when you need literature discovery, citation verification, or source-backed study extraction.
+
 ## Writing Philosophy
 
 The suite prioritizes the finished paper over the project history. It should present the final scientific logic, not the order in which analyses were tried. It should write with confidence when the evidence supports the claim, while keeping limitations and author checks in the right place.
+
+For literature work, the suite searches broadly but verifies carefully. Search results and web pages are treated as leads until the citation is checked, and extracted study details need source support before they are used in manuscript text.

@@ -11,6 +11,7 @@ It is built for real research projects with figures, tables, model outputs, note
 - Find the main scientific story in a completed analysis project.
 - Decide which results to feature, shorten, move to the supplement, or leave out.
 - Draft full biomedical manuscripts from the evidence in a project folder.
+- Find relevant papers for a research question, verify the citations, and extract study details with source support.
 - Improve abstracts, titles, figure legends, table text, cover letters, and reviewer responses.
 - Adapt a manuscript for a target journal or article type.
 - Keep author notes and unresolved checks separate from text meant for submission.
@@ -194,6 +195,29 @@ For each comment:
 Keep manuscript revisions separate from response-letter explanations.
 ```
 
+### 8. Find And Extract The Literature
+
+Use this when you want the agent to build a reliable evidence base before writing, revising, or answering reviewers.
+
+```text
+$biomedical-publication-suite
+
+Find the relevant biomedical literature for this question and build a verified evidence package.
+
+First define the question and inclusion criteria. Then search broadly across available literature sources, reference lists, citation trails, registries, and full text when available.
+
+Do not trust a paper just because a search result or web page mentions it. Verify each citation before using it. For every included study, extract the key details with a source locator or quote whenever possible.
+
+Return:
+
+1. The search strategy.
+2. The candidate papers found.
+3. The included and excluded studies with reasons.
+4. The verified citations.
+5. The extracted study details.
+6. Any papers or fields that still need full-text access or author review.
+```
+
 ### Recommended Defaults
 
 Use **Prompt 1** when the project is messy, exploratory, or high stakes. That is the best main workflow.
@@ -204,6 +228,8 @@ Use **Prompt 3** when you want the agent to produce the paper without a checkpoi
 
 Use **Prompt 5** when you are not sure the project actually supports a manuscript yet.
 
+Use **Prompt 8** when the manuscript needs a stronger literature base, when you are starting a review-style task, or when you want citation and study extraction checks before drafting.
+
 ## What Makes It Different
 
 Many manuscript-writing prompts produce a project memo: a chronological summary of files, decisions, caveats, and disconnected results. Biomedical Publication Suite pushes the agent toward the finished paper instead. It asks the agent to write for the reader of the manuscript, not for the person managing the project.
@@ -212,6 +238,8 @@ The skill emphasizes:
 
 - the final scientific logic, not the research timeline;
 - the strongest accurate finding, not every available output;
+- broad literature discovery followed by citation verification;
+- study details extracted from sources, not memory;
 - confident language inside the evidence boundary;
 - limitations in the right place, not defensive hedging throughout the manuscript;
 - clean publication text first, with author checks kept separate.
