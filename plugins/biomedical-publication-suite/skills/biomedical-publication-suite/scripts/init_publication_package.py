@@ -18,7 +18,10 @@ CLAIM_HEADER = [
     "source_file",
     "source_locator",
     "result_id",
+    "source_id",
+    "extraction_id",
     "citation_locator",
+    "verify_status",
     "status",
     "notes",
 ]
@@ -40,6 +43,47 @@ RESULTS_HEADER = [
     "unit",
     "source_file",
     "source_locator",
+    "notes",
+]
+
+LITERATURE_HEADER = [
+    "source_id",
+    "status",
+    "screening_status",
+    "title",
+    "authors",
+    "year",
+    "journal",
+    "pmid",
+    "doi",
+    "registry_id",
+    "publication_type",
+    "source_url",
+    "discovery_source",
+    "discovery_query",
+    "verify_status",
+    "verification_source",
+    "include_decision",
+    "exclusion_reason",
+    "notes",
+]
+
+EXTRACTION_HEADER = [
+    "extraction_id",
+    "source_id",
+    "field_group",
+    "field_name",
+    "field_value",
+    "unit",
+    "denominator",
+    "timepoint",
+    "comparison",
+    "source_type",
+    "source_locator",
+    "source_quote",
+    "extractor",
+    "confidence",
+    "status",
     "notes",
 ]
 
@@ -176,6 +220,19 @@ OPEN_ITEMS = """# Open Items
 ## Journal Checks
 """
 
+SEARCH_LOG = """# Search Log
+
+Use one section per search route. Record the question, source, query, date, result count, and notes about errors, rate limits, or access limits.
+
+## Search 1
+
+- Source:
+- Query:
+- Date:
+- Result count:
+- Notes:
+"""
+
 ARTIFACT_REGISTER = """# Artifact Register
 
 | Artifact | Purpose | Source | Status | Notes |
@@ -256,6 +313,11 @@ def main() -> int:
         action="store_true",
         help="Create display_text.md when drafting or QCing figure/table text.",
     )
+    parser.add_argument(
+        "--include-literature",
+        action="store_true",
+        help="Create the lean literature evidence package files.",
+    )
     parser.add_argument("--overwrite", action="store_true", help="Overwrite existing package files.")
     args = parser.parse_args()
 
@@ -277,6 +339,8 @@ def main() -> int:
         )
     if args.include_display_text:
         templates["display_text.md"] = DISPLAY_TEXT
+    if args.include_literature:
+        templates["search_log.md"] = SEARCH_LOG
     if args.profile == "submission":
         templates.update(
             {
@@ -299,6 +363,9 @@ def main() -> int:
     if args.profile == "submission":
         csv_files["claim_register.csv"] = CLAIM_HEADER
         csv_files["results_ledger.csv"] = RESULTS_HEADER
+    if args.include_literature:
+        csv_files["literature_register.csv"] = LITERATURE_HEADER
+        csv_files["extraction_ledger.csv"] = EXTRACTION_HEADER
 
     for rel, header in csv_files.items():
         if write_csv(package / rel, header, args.overwrite):

@@ -20,7 +20,10 @@ CLAIM_HEADER = [
     "source_file",
     "source_locator",
     "result_id",
+    "source_id",
+    "extraction_id",
     "citation_locator",
+    "verify_status",
     "status",
     "notes",
 ]
@@ -42,6 +45,47 @@ RESULTS_HEADER = [
     "unit",
     "source_file",
     "source_locator",
+    "notes",
+]
+
+LITERATURE_HEADER = [
+    "source_id",
+    "status",
+    "screening_status",
+    "title",
+    "authors",
+    "year",
+    "journal",
+    "pmid",
+    "doi",
+    "registry_id",
+    "publication_type",
+    "source_url",
+    "discovery_source",
+    "discovery_query",
+    "verify_status",
+    "verification_source",
+    "include_decision",
+    "exclusion_reason",
+    "notes",
+]
+
+EXTRACTION_HEADER = [
+    "extraction_id",
+    "source_id",
+    "field_group",
+    "field_name",
+    "field_value",
+    "unit",
+    "denominator",
+    "timepoint",
+    "comparison",
+    "source_type",
+    "source_locator",
+    "source_quote",
+    "extractor",
+    "confidence",
+    "status",
     "notes",
 ]
 
@@ -174,6 +218,11 @@ DOI_OR_PMID_RE = re.compile(r"(10\.\d{4,9}/[-._;()/:A-Za-z0-9]+|PMID\s*:?\s*\d+)
 ESTIMATE_RE = re.compile(
     r"\b(OR|HR|RR|IRR|ARR|aOR|AUC|AUROC|C-statistic|CI|p\s*[<=>]|median|mean|"
     r"n\s*=|\d+(?:\.\d+)?%|\d+/\d+)\b",
+    re.I,
+)
+NUMERIC_EXTRACTION_RE = re.compile(
+    r"\b(sample|n_|n\b|number|outcome|event|effect|estimate|rate|risk|odds|hazard|mean|median|"
+    r"proportion|percent|percentage|adverse|mortality|survival|follow[- ]?up)\b",
     re.I,
 )
 SECTION_HEADER_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.M)
@@ -449,6 +498,84 @@ def check_result_integrity(package: Path) -> list[Finding]:
     return findings
 
 
+def check_literature_integrity(package: Path, blocking: bool) -> list[Finding]:
+    level = "ERROR" if blocking else "WARN"
+    findings: list[Finding] = []
+    literature_path = package / "literature_register.csv"
+    extraction_path = package / "extraction_ledger.csv"
+    claim_path = package / "claim_register.csv"
+
+    literature_rows: list[dict[str, str]] = []
+    verified_sources: set[str] = set()
+    if literature_path.exists():
+        header_findings = check_csv_header(literature_path, LITERATURE_HEADER)
+        findings.extend(header_findings)
+        if not header_findings:
+            with literature_path.open(newline="", encoding="utf-8") as handle:
+                literature_rows = list(csv.DictReader(handle))
+            for idx, row in enumerate(literature_rows, start=2):
+                source_id = (row.get("source_id") or "").strip()
+                status = (row.get("status") or "").strip().lower()
+                include_decision = (row.get("include_decision") or "").strip().lower()
+                verify_status = (row.get("verify_status") or "").strip().lower()
+                if verify_status == "verified" and source_id:
+                    verified_sources.add(source_id)
+                if (status in {"verified", "included"} or include_decision == "include") and verify_status != "verified":
+                    findings.append(
+                        Finding(
+                            level,
+                            f"{literature_path}:{idx}",
+                            "Included or verified literature record does not have verify_status=verified.",
+                        )
+                    )
+
+    if extraction_path.exists():
+        findings.extend(check_csv_header(extraction_path, EXTRACTION_HEADER))
+        if not any(f.target == str(extraction_path) for f in findings):
+            with extraction_path.open(newline="", encoding="utf-8") as handle:
+                for idx, row in enumerate(csv.DictReader(handle), start=2):
+                    value = (row.get("field_value") or "").strip()
+                    status = (row.get("status") or "").strip().lower()
+                    if status in {"not_reported", "not_found", "unclear", "needs_full_text"} and not value:
+                        continue
+                    if value and not (row.get("source_id") or "").strip():
+                        findings.append(Finding(level, f"{extraction_path}:{idx}", "Extracted value lacks source_id."))
+                    if value and not (row.get("source_locator") or "").strip():
+                        findings.append(Finding(level, f"{extraction_path}:{idx}", "Extracted value lacks source_locator."))
+                    if value and not (row.get("source_quote") or "").strip():
+                        findings.append(Finding(level, f"{extraction_path}:{idx}", "Extracted value lacks source_quote."))
+                    field_name = row.get("field_name") or ""
+                    if value and re.search(r"\d", value) and NUMERIC_EXTRACTION_RE.search(field_name):
+                        missing = [
+                            col
+                            for col in ["denominator", "unit", "timepoint", "comparison"]
+                            if not (row.get(col) or "").strip()
+                        ]
+                        if missing:
+                            findings.append(
+                                Finding(
+                                    "WARN",
+                                    f"{extraction_path}:{idx}",
+                                    "Numeric extraction is missing: " + ", ".join(missing),
+                                )
+                            )
+
+    if claim_path.exists() and literature_path.exists():
+        with claim_path.open(newline="", encoding="utf-8") as handle:
+            for idx, row in enumerate(csv.DictReader(handle), start=2):
+                support_type = (row.get("support_type") or "").strip().lower()
+                source_id = (row.get("source_id") or "").strip()
+                needs_literature = support_type == "external_citation" or bool(source_id)
+                if not needs_literature:
+                    continue
+                if not source_id:
+                    findings.append(Finding(level, f"{claim_path}:{idx}", "External citation claim lacks source_id."))
+                elif source_id not in verified_sources:
+                    findings.append(Finding(level, f"{claim_path}:{idx}", "External citation claim does not point to a verified literature source."))
+
+    return findings
+
+
 def extract_part1_narrative(text: str) -> str:
     part1 = re.search(r"part\s*1\s*[-:]\s*(scientific|manuscript|external|project)\s+narrative", text, re.I)
     part2 = re.search(r"part\s*2\s*[-:]\s*editorial rationale", text, re.I)
@@ -553,6 +680,7 @@ def package_findings(args: argparse.Namespace) -> list[Finding]:
     findings.extend(check_claim_register(package / "claim_register.csv", args.require_claim_register))
     findings.extend(check_csv_header(package / "results_ledger.csv", RESULTS_HEADER))
     findings.extend(check_result_integrity(package))
+    findings.extend(check_literature_integrity(package, args.require_literature_integrity or args.fail_on_warn))
     findings.extend(check_narrative_audit(package / "narrative_audit.md", observational))
 
     return findings
@@ -595,6 +723,11 @@ def main() -> int:
     )
     parser.add_argument("--require-claim-register", action="store_true", help="Require nonempty claim register.")
     parser.add_argument("--require-citations", action="store_true", help="Require citation markers in manuscript or file.")
+    parser.add_argument(
+        "--require-literature-integrity",
+        action="store_true",
+        help="Treat unverified literature citations and ungrounded extraction rows as blocking errors.",
+    )
     parser.add_argument("--fail-on-warn", action="store_true", help="Exit nonzero when warnings are present.")
     parser.add_argument("--no-write-report", action="store_true", help="Do not update qc_report.md in package mode.")
     args = parser.parse_args()

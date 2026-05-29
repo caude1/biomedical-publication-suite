@@ -44,6 +44,9 @@ The portable pieces are:
 - references/ progressive-disclosure reference files.
 - scripts/init_publication_package.py.
 - scripts/publication_qc.py.
+- scripts/verify_identifiers.py.
+- scripts/extraction_audit.py.
+- scripts/citation_audit.py.
 
 The Python scripts use only the standard library. They should work from any local agent that can run Python and read the skill directory.
 
